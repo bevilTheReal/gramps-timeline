@@ -1,8 +1,9 @@
 'use strict';
 
-const express = require('express');
+var express = require('express');
 var fs = require('fs');
 var sql = require('sql.js')
+var bodyParser = require('body-parser')
 
 // Constants
 const PORT = 8081;
@@ -10,6 +11,12 @@ const HOST = '0.0.0.0';
 
 // App
 const app = express();
+
+app.use( bodyParser.json() );       // to support JSON-encoded bodies
+app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+  extended: true
+}));
+
 app.use('/public', express.static(__dirname + '/public'));
 app.get('/', (req, res) => {
   res.sendFile('timeline.html', { root: __dirname });
@@ -25,7 +32,18 @@ app.post('/timeline-data', (req, res) => {
     {id: 6, content: 'item 6', start: '2014-04-27', type: 'point'}
   ]
   
-   var filebuffer = fs.readFileSync(__dirname + "/../gramps-timeline-private-data/mydb.sql")
+   var bodyParser = require('body-parser')
+   var result = performSqlQuery(req.body.from, req.body.to)
+   console.log(result.length)
+  
+   res.json(data)
+});
+
+app.listen(PORT, HOST);
+console.log(`Running on http://${HOST}:${PORT}`);
+
+function performSqlQuery(from, to) {
+	var filebuffer = fs.readFileSync(__dirname + "/../gramps-timeline-private-data/mydb.sql")
    var db = new sql.Database(filebuffer);
   
    const sqlRequest=`
@@ -48,14 +66,16 @@ app.post('/timeline-data', (req, res) => {
       JOIN link AS LK4 ON ((LK4.from_type = 'event') AND (LK4.to_type = 'date') AND (PS1.death_ref_handle = LK4.from_handle))
       LEFT OUTER
       JOIN date AS DT2 ON (LK4.to_handle = DT2.handle)
-      where DT1.year1 < 1981 and DT1.year1 > 1970
+      where (DT1.year1 <= $to and DT1.year1 >= $from)
+      	OR (DT2.year1 <= $to and DT2.year1 >= $from)
+      	OR (DT1.year1 <= $from AND DT2.year1 >= $to)
    ORDER BY DT1.year1 ASC;`
    
-   var xx = db.exec(sqlRequest)
-   console.log(xx)
-  
-   res.json(data)
-});
-
-app.listen(PORT, HOST);
-console.log(`Running on http://${HOST}:${PORT}`);
+   var stmt = db.prepare(sqlRequest, {'$from': from, '$to': to});
+   
+   var result=[]
+   while (stmt.step())
+   	result.push(stmt.getAsObject())
+   stmt.free();
+   return result
+}

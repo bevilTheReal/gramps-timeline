@@ -9,7 +9,8 @@
   },
   "dependencies": {
     "express": "^4.13.3",
+    "body-parser": "^1.17.2",
     "sql.js": "^0.4.0",
-    "fs": "^8.4.0"
+    "fs": "^0.0.1-security"
   }
 }
