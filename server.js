@@ -27,19 +27,36 @@ app.get('/', (req, res) => {
 app.post('/timeline-data', (req, res) => {
    var bodyParser = require('body-parser')
    var persons = performSqlQuery(req.body.from, req.body.to, req.body.name)
-   console.log(persons.length)
+   console.log('From ' + req.body.from + ' to ' + req.body.to + ', ' + persons.length + ' person(s) found with name ' + req.body.name)
 
    var personsCount = persons.length
    var result = []
    for (var i = 0; i < personsCount; i++) {
       var person = persons[i]
+		var birth = normalizeDate(person.bdate)
+		// Exclude persons more than 110 year-old (case of missing year of death)
+		if (person.ddate === 'Living' && birth.getFullYear() + 110 < req.body.from)
+			continue
+			
+		var birth1 = Math.max(new Date(req.body.from, 1, 1, 1, 1, 1, 1).valueOf(), birth.valueOf())
+		birth = new Date(birth1)
+		
+		var death
+		if (person.ddate === 'Living') {
+			death = new Date(req.body.to, 1, 1, 1, 1, 1, 1)
+		} else {
+			var death = normalizeDate(person.ddate)
+			var death1 = Math.min(new Date(req.body.to, 1, 1, 1, 1, 1, 1).valueOf(), death.valueOf())
+			death = new Date(death1)
+		}
+      
       var item = {
          id: i,
          content: person.name + ' ' + person.surname,
-         start: normalizeDate(person.bdate)
+         start: birth.toJSON(),
+         end: death.toJSON()
       }
       if (person.ddate !== 'Living') {
-         item.end = normalizeDate(person.ddate)
          item.className = 'dead'
       } else {
          item.className = 'living'
@@ -56,11 +73,11 @@ console.log(`Running on http://${HOST}:${PORT}`);
 function normalizeDate(d) {
    var s = d.split('-')
    if (s[1] !== '0' && s[2] !== '0')
-      return d
+      return new Date(s[0], s[1], s[2], 1, 1, 1, 1)
    if (s[1] !== '0' && s[2] === '0')
-      return s[0] + '-' + s[1] + '-1'
+      return new Date(s[0], s[1], 1, 1, 1, 1, 1)
    else
-      return s[0] + '-1-1'
+      return new Date(s[0], 1, 1, 1, 1, 1, 1)
 }
 
 function performSqlQuery(from, to, name) {

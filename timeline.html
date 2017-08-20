@@ -21,10 +21,14 @@
 <p>Année de début: <input type="number" min="1400" max="2100" id="number" v-model="year_from"></p>
 <p>Année de fin: <input type="number" min="1400" max="2100" id="number" v-model="year_to"></p>
 <p>Nom: <input v-model="name"></p>
+<p><i>Si aucune date de décès n'est enregistrée, les personnes ayant plus de 110 ans sont automatiquement exclues</i></p>
+
 <input type="button" value="Afficher" v-on:click="click()">
 </div>
 
+<p>
 <div id="timeline-view"></div>
+</p>
 
 </div>
 
