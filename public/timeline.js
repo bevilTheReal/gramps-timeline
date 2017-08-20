@@ -19,9 +19,9 @@ new Vue({
 
          request.open("POST", "/timeline-data", true);
          request.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-         request.onreadystatechange = function(rep) {
+         request.onreadystatechange = function() {
             if (request.readyState === XMLHttpRequest.DONE && request.status === 200) {
-               self.timeline_dataset = JSON.parse(rep.srcElement.response)
+               self.timeline_dataset = JSON.parse(request.responseText)
                self.displayTimeline()
             }
          }
