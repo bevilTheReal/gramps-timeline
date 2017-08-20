@@ -1,0 +1,51 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# kdevelop files
+*.kdev4
+.kdev4/*
+
+# cmake build directory
+build/*
+
+# ctags & cscope
+tags
+cscope.out
+
+*.swp
+*~
+Session.vim
+.ycm_extra_conf.py
+.ycm_extra_conf.pyc
+
+.project
+node_modules/*
+.settings/*
+
+*.bfproject
