@@ -1,3 +1,13 @@
 #number {
-  width: 4em;
+   width: 4e m;
+}
+
+.vis-item.living {
+   background-color: greenyellow;
+   border-color: green;
+}
+
+.vis-item.dead {
+   background-color: lightblue;
+   border-color: blue;
 }

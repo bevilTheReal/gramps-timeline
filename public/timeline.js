@@ -4,16 +4,17 @@ new Vue({
    data: {
       year_from: 1900,
       year_to: 2000,
+      name: null,
       timeline_dataset: null
    },
 
    methods: {
       click: function() {
          var self = this
-         if (self.year_from == null || self.year_to == null || self.year_from > self.year_to)
+         if (self.year_from == null || self.year_to == null || self.year_from > self.year_to || self.name == null || self.name.trim() === '')
             return
 
-			var params = {"from": self.year_from, "to": self.year_to}
+			var params = {"from": self.year_from, "to": self.year_to, 'name': self.name.trim()}
          var request = new XMLHttpRequest();
 
          request.open("POST", "/timeline-data", true);
